@@ -35,7 +35,7 @@ git clone https://github.com/ST2DCE/2024-2025.git
 
 * frontend : The webapp that retrieves the books from the database and shows them in a HTML page. This webapp is build using Flask (a Python Microframework).
 
-## Exercise ##
+## Work to be done ##
 
 ### 1. Building the backend and frontend ###
 
