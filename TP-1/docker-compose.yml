@@ -2,6 +2,7 @@ version: "3.8"
 services:
   backend:
     image: "pierrebonnet78/backend:1"
+    container_name: backend
     build:
       context: backend
       dockerfile: Dockerfile
@@ -9,20 +10,21 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     networks:
-      - efrei_net
+      - efrei
 
   frontend:
+    image: "pierrebonnet78/frontend:1"
+    container_name: frontend
     build:
       context: frontend
       dockerfile: Dockerfile
-    image: "pierrebonnet78/frontend:1"
     networks:
-      - efrei_net
+      - efrei
     ports:
       - "8081:80"
     depends_on:
       - backend
 
 networks:
-  efrei_net:
+  efrei:
     driver: bridge
