@@ -27,4 +27,5 @@ services:
 
 networks:
   efrei:
+    name: efrei_network
     driver: bridge
