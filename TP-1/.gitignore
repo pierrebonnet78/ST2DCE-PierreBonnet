@@ -1,0 +1,2 @@
+#private ssh key of the jenkins slave container
+*.pem

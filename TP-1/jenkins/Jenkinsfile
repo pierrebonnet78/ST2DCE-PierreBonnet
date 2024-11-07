@@ -1,0 +1,66 @@
+def backendImage = ''
+def frontendImage = ''
+pipeline {
+
+  agent {
+    label 'jenkins-slave'
+  }
+  environment {
+    DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'                   // Jenkins credentials ID
+    GITHUB_CREDENTIALS = "github-credentials"                           // Github credentials ID
+    GITHUB_URL_REPOSITORY = "https://github.com/ST2DCE/2024-2025.git"   // Github URL Repository 
+    DOCKER_IMAGE_BACKEND_NAME = 'pierrebonnet78/backend'                // Docker Hub frontend repository name
+    DOCKER_IMAGE_FRONTEND_NAME = 'pierrebonnet78/frontend'              // Docker Hub backend repository name
+    DOCKER_IMAGE_TAG = '1'                                              // Image tag
+  }
+
+  stages {
+    stage('Cloning Git') {
+      steps {
+        git branch: 'main', credentialsId: "${GITHUB_CREDENTIALS}", url: "${GITHUB_URL_REPOSITORY}"
+      }
+    }
+    stage('Build and Publish backend image') {
+      steps {
+        script {
+          dir('TP-1') {
+            sh "docker-compose -f docker-compose.yml build backend"
+            withDockerRegistry(credentialsId: "${DOCKER_HUB_CREDENTIALS}") {
+                sh "docker tag tp-1-backend pierrebonnet78/backend:1"
+                sh "docker push pierrebonnet78/backend:1"
+            }
+
+          }
+        }
+      }
+    }
+
+    stage('Build and Publish frontend image') {
+      steps {
+        script {
+          dir('TP-1') {
+            sh "docker-compose -f docker-compose.yml build frontend"
+            withDockerRegistry(credentialsId: "${DOCKER_HUB_CREDENTIALS}") {
+                sh "docker tag tp-1-frontend pierrebonnet78/frontend:1"
+                sh "docker push pierrebonnet78/frontend:1"
+            }
+
+          }
+        }
+      }
+    }
+
+    stage('Deploy Containers') {
+            steps {
+                script {
+                    dir('TP-1') {
+                        // Stop and remove any existing containers
+                        sh 'docker rm -f tp-1-frontend-1 || true'
+                        sh 'docker rm -f tp-1-backend-1 || true'
+                        sh "docker-compose -f docker-compose.yml up -d"
+                    }
+                }
+            }
+        }
+  }
+}
